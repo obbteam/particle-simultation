@@ -33,7 +33,7 @@ int main()
 
         solver.applyGravity(particles); // Apply gravity to the particles
         solver.update(particles);       // Update the position of the particles
-        solver.checkBounds(particles);  // Check for collisions with the bounds
+        solver.applyBoundary(particles);  // Check for collisions with the bounds
         renderer.draw(particles);       // Draw the particle shape
         window.display();
     }
