@@ -22,7 +22,7 @@ public:
     void drawBoxBounds(sf::Vector2f size, sf::Vector2f pos) {
         sf::RectangleShape box (size);
         box.setPosition(pos);
-        box.setFillColor(sf::Color::White);
+        box.setFillColor(sf::Color(211,211,211));
         box.setOutlineThickness(2.f);
         box.setOutlineColor(sf::Color::Black);
         window_.draw(box);
