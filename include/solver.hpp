@@ -48,6 +48,22 @@ public:
         }
     }
 
+    void applyCollisions(std::vector<Particle> &particles)
+    {
+        for (int i = 0; i < particles.size(); ++i)
+        {
+            for (int j = i + 1; j + 1 < particles.size(); ++j)
+            {
+                auto dist = particles[i].dist(particles[j]);
+                auto minDist = particles[i].getRadius() - particles[j].getRadius();
+
+                if (dist <= minDist) {
+
+                }
+            }
+        }
+    }
+
     void applyBoxBoundary(std::vector<Particle> &particles)
     {
         for (auto &particle : particles)
@@ -58,7 +74,7 @@ public:
 
             if (position.x - radius <= box_pos_.x)
             {
-                particle.setPosition({ radius, position.y});
+                particle.setPosition({radius, position.y});
                 particle.setVelocity({velocity.x * -1, velocity.y});
             }
             else if (position.x + radius >= box_size_.x)

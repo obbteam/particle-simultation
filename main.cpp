@@ -51,6 +51,7 @@ int main()
         solver.applyGravity(particles);     // Apply gravity to the particles
         solver.update(particles);           // Update the position of the particles
         solver.applyBoxBoundary(particles); // Check for collisions with the bounds
+        solver.applyCollisions(particles);
         renderer.draw(particles);           // Draw the particle shape
         window.display();
     }
