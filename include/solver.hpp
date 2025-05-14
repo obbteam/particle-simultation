@@ -58,7 +58,9 @@ public:
                 auto minDist = particles[i].getRadius() - particles[j].getRadius();
 
                 if (dist <= minDist) {
-
+                        // do collision
+                        // calculate magnituted
+                        //
                 }
             }
         }
