@@ -4,12 +4,12 @@
 
 struct Constants
 {
-    static constexpr float GRAVITY = 1000.f;  // m/s^2
-    static constexpr float FRAME_RATE = 60.f; // frames per second
-    static constexpr int WINDOW_WIDTH = 800;  // pixels
-    static constexpr int WINDOW_HEIGHT = 600; // pixels
+    static constexpr float GRAVITY = 1000.f;    // m/s^2
+    static constexpr float FRAME_RATE = 6000.f; // frames per second
+    static constexpr int WINDOW_WIDTH = 800;    // pixels
+    static constexpr int WINDOW_HEIGHT = 600;   // pixels
     static constexpr sf::Vector2f BOX_SIZE = sf::Vector2f(WINDOW_WIDTH - 50, WINDOW_HEIGHT - 50);
-    static constexpr sf::Vector2f BOX_POS = sf::Vector2f(WINDOW_WIDTH / 2 - BOX_SIZE.x / 2, WINDOW_HEIGHT / 2 - BOX_SIZE.y / 2);
+    static constexpr sf::Vector2f BOX_POS = sf::Vector2f((WINDOW_WIDTH - BOX_SIZE.x) / 2, (WINDOW_HEIGHT - BOX_SIZE.y) / 2);
 
     static constexpr float CIRCLE_RADIUS = std::min(WINDOW_HEIGHT, WINDOW_WIDTH) / 2 - 50.f;
     static constexpr sf::Vector2f CIRLCE_POS = sf::Vector2f(WINDOW_WIDTH / 2 - CIRCLE_RADIUS, WINDOW_HEIGHT / 2 - CIRCLE_RADIUS);
@@ -52,15 +52,29 @@ public:
     {
         for (int i = 0; i < particles.size(); ++i)
         {
-            for (int j = i + 1; j + 1 < particles.size(); ++j)
+            for (int j = i + 1; j < particles.size(); ++j)
             {
-                auto dist = particles[i].dist(particles[j]);
-                auto minDist = particles[i].getRadius() - particles[j].getRadius();
+                sf::Vector2f v = particles[i].getPosition() - particles[j].getPosition();
 
-                if (dist <= minDist) {
-                        // do collision
-                        // calculate magnituted
-                        //
+                auto dist = sqrt(v.x * v.x + v.y * v.y);
+                if (dist == 0.f)
+                    dist = 0.0001f; // or random-jitter one of them
+                auto minDist = particles[i].getRadius() + particles[j].getRadius();
+
+                if (dist < minDist)
+                {
+                    sf::Vector2f norm = v / dist;          // direction unit vector (length = 1)
+                    float delta = 0.5f * (minDist - dist); // how much are they are jammed into each other
+                    float totalMass = particles[i].getRadius() * particles[i].getRadius() + particles[j].getRadius() * particles[j].getRadius();
+                    float massRatio = (particles[i].getRadius() * particles[i].getRadius()) / totalMass;
+
+                    particles[i].setPosition(particles[i].getPosition() + norm * (1 - massRatio) * delta);
+                    particles[j].setPosition(particles[j].getPosition() - norm * massRatio * delta);
+
+                    auto v1 = particles[i].getVelocity();
+                    auto v2 = particles[j].getVelocity();
+                    particles[i].setVelocity(v1 + v2);
+                    particles[j].setVelocity(v2 + v1);
                 }
             }
         }
@@ -68,31 +82,35 @@ public:
 
     void applyBoxBoundary(std::vector<Particle> &particles)
     {
+        auto left = box_pos_.x;
+        auto right = box_pos_.x + box_size_.x;
+        auto top = box_pos_.y;
+        auto bottom = box_pos_.y + box_size_.y;
         for (auto &particle : particles)
         {
             sf::Vector2f position = particle.getPosition();
             sf::Vector2f velocity = particle.getVelocity();
             float radius = particle.getRadius();
 
-            if (position.x - radius <= box_pos_.x)
+            if (position.x - radius < left)
             {
-                particle.setPosition({radius, position.y});
+                particle.setPosition({left + radius, position.y});
                 particle.setVelocity({velocity.x * -1, velocity.y});
             }
-            else if (position.x + radius >= box_size_.x)
+            else if (position.x + radius > right)
             {
-                particle.setPosition({box_size_.x - radius, position.y});
+                particle.setPosition({right - radius, position.y});
                 particle.setVelocity({velocity.x * -1, velocity.y});
             }
 
-            if (position.y - radius <= box_pos_.y)
+            if (position.y - radius < top)
             {
-                particle.setPosition({position.x, radius});
+                particle.setPosition({position.x, top + radius});
                 particle.setVelocity({velocity.x, velocity.y * -1});
             }
-            else if (position.y + radius >= box_size_.y)
+            else if (position.y + radius > bottom)
             {
-                particle.setPosition({position.x, box_size_.y - radius});
+                particle.setPosition({position.x, bottom - radius});
                 particle.setVelocity({velocity.x, velocity.y * -1});
             }
         }
