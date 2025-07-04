@@ -14,6 +14,10 @@ int main()
     Solver solver(1.f / Constants::FRAME_RATE); // Create a solver with a time step of 1/60 seconds
     solver.setBoxBounds(Constants::BOX_SIZE, Constants::BOX_POS);
 
+    // Particle particle1(10.0f, {25.0f, 750.0f}, {200.0f, 0.f});
+    // Particle particle2(10.0f, {750.0f, 750.0f}, {-150.0f, 0.f});
+    // particles.emplace_back(particle1);
+    // particles.emplace_back(particle2);
     for (int i = 0; i < 10; ++i)
     {
         Particle particle(10.0f, {100.0f, 100.0f}, {i * 50.0f, i * 50.0f}); // Create a particle with radius 10, position (100, 100), and velocity (0, 0)

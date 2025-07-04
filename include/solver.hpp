@@ -4,10 +4,10 @@
 
 struct Constants
 {
-    static constexpr float GRAVITY = 1000.f;    // m/s^2
-    static constexpr float FRAME_RATE = 6000.f; // frames per second
-    static constexpr int WINDOW_WIDTH = 800;    // pixels
-    static constexpr int WINDOW_HEIGHT = 600;   // pixels
+    static constexpr float GRAVITY = 1000.f;   // m/s^2
+    static constexpr float FRAME_RATE = 600.f; // frames per second
+    static constexpr int WINDOW_WIDTH = 800;   // pixels
+    static constexpr int WINDOW_HEIGHT = 600;  // pixels
     static constexpr sf::Vector2f BOX_SIZE = sf::Vector2f(WINDOW_WIDTH - 50, WINDOW_HEIGHT - 50);
     static constexpr sf::Vector2f BOX_POS = sf::Vector2f((WINDOW_WIDTH - BOX_SIZE.x) / 2, (WINDOW_HEIGHT - BOX_SIZE.y) / 2);
 
@@ -63,18 +63,30 @@ public:
 
                 if (dist < minDist)
                 {
+                    auto u1 = particles[i].getVelocity();
+                    auto u2 = particles[j].getVelocity();
+
+                    auto m1 = particles[i].getRadius() * particles[i].getRadius();
+                    auto m2 = particles[j].getRadius() * particles[j].getRadius();
+
+                    std::cout << particles[i].getVelocity().x << ":" << particles[i].getVelocity().y << std::endl;
+                    std::cout << particles[j].getVelocity().x << ":" << particles[j].getVelocity().y << std::endl;
+
                     sf::Vector2f norm = v / dist;          // direction unit vector (length = 1)
                     float delta = 0.5f * (minDist - dist); // how much are they are jammed into each other
-                    float totalMass = particles[i].getRadius() * particles[i].getRadius() + particles[j].getRadius() * particles[j].getRadius();
-                    float massRatio = (particles[i].getRadius() * particles[i].getRadius()) / totalMass;
+                    float totalMass = m1 + m2;
+                    float massRatio = m1 / totalMass;
 
                     particles[i].setPosition(particles[i].getPosition() + norm * (1 - massRatio) * delta);
                     particles[j].setPosition(particles[j].getPosition() - norm * massRatio * delta);
 
-                    auto v1 = particles[i].getVelocity();
-                    auto v2 = particles[j].getVelocity();
-                    particles[i].setVelocity(v1 + v2);
-                    particles[j].setVelocity(v2 + v1);
+                    auto v1 = (m2 * (u2 - u1) + u1 * m1 + u2 * m2) / (m1 + m2);
+                    auto v2 = (m1 * (u1 - u2) + u1 * m1 + u2 * m2) / (m1 + m2);
+                    particles[i].setVelocity(v1);
+                    particles[j].setVelocity(v2);
+
+                    std::cout << particles[i].getVelocity().x << ":" << particles[i].getVelocity().y << std::endl;
+                    std::cout << particles[j].getVelocity().x << ":" << particles[j].getVelocity().y << std::endl;
                 }
             }
         }
