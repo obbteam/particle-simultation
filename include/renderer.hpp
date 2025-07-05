@@ -11,9 +11,7 @@ public:
             sf::CircleShape circle(particle.getRadius());
             circle.setOrigin({particle.getRadius(), particle.getRadius()});
             circle.setPosition(particle.getPosition());
-            // sf::Color color(rand() % 255, rand() % 255, rand() % 255); // Random color
-            sf::Color color = sf::Color::White;
-            circle.setFillColor(color); // Set the color of the particle
+            circle.setFillColor(particle.getColor());
             circle.setOutlineThickness(1.f);
             circle.setOutlineColor(sf::Color::Black);
             window_.draw(circle); // Draw the particle shape
@@ -37,7 +35,17 @@ public:
         circle.setPosition(bounds.second);
         circle.setFillColor(sf::Color::Black);
         window_.draw(circle);
-    };
+    }
+
+    void updateNumberParticles(int n)
+    {
+        const sf::Font font("ARIAL.TTF");
+        sf::Text text(font, std::to_string(n), 30);
+        text.setStyle(sf::Text::Bold);
+        text.setFillColor(sf::Color::Red);
+        text.setPosition({5.f, 5.f});
+        window_.draw(text);
+    }
 
 private:
     sf::RenderWindow &window_;
