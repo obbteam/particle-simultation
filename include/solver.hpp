@@ -78,14 +78,14 @@ public:
         }
     }
 
-    void pushParticles(int n, sf::Clock &spawnClock)
+    void pushParticles(sf::Clock &spawnClock)
     {
         if (objects_.size() >= 100)
             return;
 
         if (spawnClock.getElapsedTime() >= Constants::SPAWN_INTERVAL)
         {
-            float x = std::sin(n);
+            float x = std::sin(objects_.size());
             Particle p(rand() % 4 + 1, Constants::CANNON_POS, {x * 250.0f, 50.0f});
             objects_.push_back(p);
             spawnClock.restart();
@@ -174,6 +174,11 @@ public:
     void pushParticle(Particle &p)
     {
         objects_.emplace_back(p);
+    }
+
+    int getNumObjects()
+    {
+        return objects_.size();
     }
 
 private:

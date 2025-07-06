@@ -16,7 +16,6 @@ int main()
     Solver solver(1.f / Constants::FRAME_RATE, particles); // Create a solver with a time step of 1/60 seconds
     solver.setBoxBounds(Constants::BOX_SIZE, Constants::BOX_POS);
 
-    int n = 0;
     auto [box_size, box_pos] = solver.getBoxBounds();
 
     while (window.isOpen())
@@ -40,8 +39,8 @@ int main()
 
         window.clear(sf::Color::Black);
         renderer.drawBoxBounds(box_size, box_pos);
-        renderer.updateNumberParticles(n);
-        solver.pushParticles(n++, spawnClock);
+        renderer.updateNumberParticles(solver.getNumObjects());
+        solver.pushParticles(spawnClock);
         solver.update();                    // Update the position of the particles
         renderer.draw(solver.getObjects()); // Draw the particle shape
         window.display();
