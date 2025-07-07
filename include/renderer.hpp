@@ -3,7 +3,19 @@
 class Renderer
 {
 public:
-    Renderer(sf::RenderWindow &window) : window_(window) {};
+    Renderer(sf::RenderWindow &w) : window_(w), font_(), fpsText_(font_, "", 20), particlesNumText_(font_, "", 20)
+    {
+        if (!font_.openFromFile("ARIAL.TTF"))
+            throw std::runtime_error("font load failed");
+        fpsText_.setStyle(sf::Text::Bold);
+        fpsText_.setFillColor(sf::Color::Green);
+        fpsText_.setPosition({650.f, 5.f});
+
+        particlesNumText_.setStyle(sf::Text::Bold);
+        particlesNumText_.setFillColor(sf::Color::Red);
+        particlesNumText_.setPosition({5.f, 5.f});
+    };
+
     void draw(std::vector<Particle> &particles)
     {
         for (const auto &particle : particles)
@@ -28,25 +40,25 @@ public:
         window_.draw(box);
     }
 
-    // collisions for this are not implemented
-    void drawCircleBounds(std::pair<float, sf::Vector2f> bounds)
-    {
-        sf::CircleShape circle(bounds.first);
-        circle.setPosition(bounds.second);
-        circle.setFillColor(sf::Color::Black);
-        window_.draw(circle);
-    }
-
     void updateNumberParticles(int n)
     {
-        const sf::Font font("ARIAL.TTF");
-        sf::Text text(font, std::to_string(n), 30);
-        text.setStyle(sf::Text::Bold);
-        text.setFillColor(sf::Color::Red);
-        text.setPosition({5.f, 5.f});
-        window_.draw(text);
+        std::ostringstream oss;
+        oss << n;
+        particlesNumText_.setString(oss.str());
+        window_.draw(particlesNumText_);
+    }
+
+    void updateFPS(float fps)
+    {
+        std::ostringstream oss;
+        oss << "FPS: " << std::fixed << std::setprecision(1) << fps;
+        fpsText_.setString(oss.str());
+        window_.draw(fpsText_);
     }
 
 private:
     sf::RenderWindow &window_;
+    sf::Text fpsText_;
+    sf::Text particlesNumText_;
+    sf::Font font_;
 };

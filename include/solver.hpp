@@ -9,6 +9,7 @@ struct Constants
     static constexpr float FRAME_RATE = 60.f; // frames per second
     static constexpr int SUB_STEPS = 8;
     static constexpr int MAX_PARTICLES = 2000;
+    static constexpr int MAX_PARTICLE_SIZE = 5;
 
     static constexpr int WINDOW_WIDTH = 800;  // pixels
     static constexpr int WINDOW_HEIGHT = 600; // pixels
@@ -84,11 +85,18 @@ public:
         if (objects_.size() >= Constants::MAX_PARTICLES)
             return;
 
+        /*--- spawn once every SPAWN_INTERVAL ---*/
         if (spawnClock.getElapsedTime() >= Constants::SPAWN_INTERVAL)
         {
-            float x = 0.5 * std::sin(objects_.size());
-            Particle p(rand() % 4 + 1, Constants::CANNON_POS, {x, 50.0f});
-            objects_.push_back(p);
+            float vx = cannon_amp_ * std::sin(cannon_phase_);
+            cannon_phase_ += 0.05f;
+
+            /* create the particle ---------------------------------- */
+            float radius = static_cast<float>(rand() % Constants::MAX_PARTICLE_SIZE + 1);
+            objects_.emplace_back(radius,
+                                  Constants::CANNON_POS,        // start at the “cannon”
+                                  sf::Vector2f{vx, cannon_y_}); // left + sinusoidally up/down
+
             spawnClock.restart();
         }
     }
@@ -211,4 +219,8 @@ private:
     std::vector<Particle> objects_;
 
     sf::Vector2f gravity_ = {0, Constants::GRAVITY};
+
+    float cannon_phase_ = 0.f;       // or use this if you prefer a counter
+    const float cannon_amp_ = 250.f; // vertical amplitude    (pixels / sec)
+    const float cannon_y_ = 100.f;   // base speed to the left
 };
