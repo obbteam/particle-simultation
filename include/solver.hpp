@@ -8,13 +8,14 @@ struct Constants
     static constexpr float GRAVITY = 100.f;   // m/s^2
     static constexpr float FRAME_RATE = 60.f; // frames per second
     static constexpr int SUB_STEPS = 8;
+    static constexpr int MAX_PARTICLES = 2000;
 
     static constexpr int WINDOW_WIDTH = 800;  // pixels
     static constexpr int WINDOW_HEIGHT = 600; // pixels
     static constexpr sf::Vector2f BOX_SIZE = sf::Vector2f(WINDOW_WIDTH - 50, WINDOW_HEIGHT - 50);
     static constexpr sf::Vector2f BOX_POS = sf::Vector2f((WINDOW_WIDTH - BOX_SIZE.x) / 2, (WINDOW_HEIGHT - BOX_SIZE.y) / 2);
-    static constexpr sf::Vector2f CANNON_POS = {BOX_POS.x + (BOX_SIZE.x / 2), BOX_POS.y + (BOX_SIZE.y / 4)};
-    static constexpr sf::Time SPAWN_INTERVAL = sf::milliseconds(60);
+    static constexpr sf::Vector2f CANNON_POS = {BOX_POS.x + (BOX_SIZE.x / 2), BOX_POS.y + (BOX_SIZE.y / 8)};
+    static constexpr sf::Time SPAWN_INTERVAL = sf::milliseconds(20);
 
     static constexpr float COR = 0.7f; // coef of restitution
 };
@@ -80,13 +81,13 @@ public:
 
     void pushParticles(sf::Clock &spawnClock)
     {
-        if (objects_.size() >= 100)
+        if (objects_.size() >= Constants::MAX_PARTICLES)
             return;
 
         if (spawnClock.getElapsedTime() >= Constants::SPAWN_INTERVAL)
         {
-            float x = std::sin(objects_.size());
-            Particle p(rand() % 4 + 1, Constants::CANNON_POS, {x * 250.0f, 50.0f});
+            float x = 0.5 * std::sin(objects_.size());
+            Particle p(rand() % 4 + 1, Constants::CANNON_POS, {x, 50.0f});
             objects_.push_back(p);
             spawnClock.restart();
         }
@@ -156,8 +157,30 @@ public:
     {
         for (auto &particle : objects_)
         {
-            sf::Vector2f newVelocity = particle.getVelocity() + sf::Vector2f(0, Constants::GRAVITY) * timeStep_;
+            sf::Vector2f newVelocity = particle.getVelocity() + gravity_ * timeStep_;
             particle.setVelocity(newVelocity);
+        }
+    }
+
+    void changeGravity(const sf::Keyboard::Scancode &key)
+    {
+        switch (key)
+        {
+        case sf::Keyboard::Scancode::Left:
+            gravity_ = {-Constants::GRAVITY, 0};
+            break;
+        case sf::Keyboard::Scancode::Up:
+            gravity_ = {0, -Constants::GRAVITY};
+            break;
+        case sf::Keyboard::Scancode::Right:
+            gravity_ = {Constants::GRAVITY, 0};
+            break;
+        case sf::Keyboard::Scancode::Down:
+            gravity_ = {0, Constants::GRAVITY};
+            break;
+
+        default:
+            std::cerr << "Wrong Key for changeGravity" << std::endl;
         }
     }
 
@@ -186,4 +209,6 @@ private:
     sf::Vector2f box_size_ = {250.f, 250.f};
     sf::Vector2f box_pos_ = {0.f, 0.f};
     std::vector<Particle> objects_;
+
+    sf::Vector2f gravity_ = {0, Constants::GRAVITY};
 };

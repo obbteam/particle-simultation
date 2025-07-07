@@ -35,6 +35,14 @@ int main()
                     solver.pushParticle(par);
                 }
             }
+            else if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (keyPressed->scancode == sf::Keyboard::Scancode::Left ||
+                    keyPressed->scancode == sf::Keyboard::Scancode::Up ||
+                    keyPressed->scancode == sf::Keyboard::Scancode::Right ||
+                    keyPressed->scancode == sf::Keyboard::Scancode::Down)
+                    solver.changeGravity(keyPressed->scancode);
+            }
         }
 
         window.clear(sf::Color::Black);
