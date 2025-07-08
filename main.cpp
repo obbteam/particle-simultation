@@ -2,7 +2,7 @@
 #include <iostream>
 #include "include/solver.hpp"
 #include "include/renderer.hpp"
-// #include "include/constants.hpp"
+#include "include/constants.hpp"
 
 static sf::Clock spawnClock; // declared outside the loop
 

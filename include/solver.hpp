@@ -8,7 +8,7 @@ class Solver
 {
 public:
     // Constructor
-    Solver(float timeStep, std::vector<Particle> objects);
+    Solver(float timeStep, std::vector<Particle> &objects);
 
     void setBoxBounds(sf::Vector2f size, sf::Vector2f pos)
     {
@@ -23,8 +23,6 @@ public:
     };
 
     void applyCollisions();
-
-    void pushParticles(sf::Clock &spawnClock);
 
     void applyCircleBoundary();
 
@@ -41,14 +39,15 @@ public:
     // Methid to change the gravity direction on Arrows
     void changeGravity(const sf::Keyboard::Scancode &key);
 
+    void pushParticle(Particle &p) { _objects.emplace_back(std::move(p)); }
+    void pushParticles(sf::Clock &spawnClock);
+
     void leftMouseClick(const sf::Vector2i mousePos);
 
     std::tuple<sf::Vector2f, sf::Vector2f> getBoxBounds() const { return {_box_size, _box_pos}; }
     std::tuple<float, sf::Vector2f> getCircleBounds() const { return {_circle_radius, _circle_pos}; }
 
     std::vector<Particle> &getObjects() { return _objects; }
-
-    void pushParticle(Particle &p) { _objects.emplace_back(p); }
 
     int getNumObjects() const { return _objects.size(); }
 
@@ -66,7 +65,8 @@ private:
 
     sf::Vector2f _gravity = {0, Constants::GRAVITY};
 
-    float _cannon_phase = 0.f;        // or use this if you prefer a counter
-    const float _cannon_amp = 2500.f; // vertical amplitude    (pixels / sec)
-    const float _cannon_y = 1000.f;   // base speed to the left
+    float _cannon_phase = 0.f;       // or use this if you prefer a counter
+    const float _cannon_amp = 250.f; // vertical amplitude    (pixels / sec)
+    const float _cannon_y = 50.f;    // base speed to the left
+    const float _cannon_delta = 0.1f;
 };

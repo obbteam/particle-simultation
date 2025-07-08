@@ -2,7 +2,7 @@
 #include <iostream>
 #include "math.h"
 
-Solver::Solver(float timeStep, std::vector<Particle> objects)
+Solver::Solver(float timeStep, std::vector<Particle> &objects)
     : _time_step(timeStep), _objects(objects) {};
 
 void Solver::applyCollisions()
@@ -36,7 +36,9 @@ void Solver::applyCollisions()
             p2.setPosition(p2.getPosition() - 0.5f * n * massRatio * delta);
 
             // impulse calculations
-            sf::Vector2f relVel = p1.getAcceleration() - p2.getAcceleration();
+            auto v1 = p1.getPosition() - p1.getOldPosition();
+            auto v2 = p2.getPosition() - p2.getOldPosition();
+            sf::Vector2f relVel = v1 - v2;
             float accelAlongN = relVel.x * n.x + relVel.y * n.y;
             if (accelAlongN > 0.f)
                 continue; // already separating
@@ -46,8 +48,8 @@ void Solver::applyCollisions()
 
             sf::Vector2f impulse = j * n;
 
-            p1.setAcceleration(p1.getAcceleration() + impulse / m1);
-            p2.setAcceleration(p2.getAcceleration() - impulse / m2);
+            p1.setOldPosition(p1.getOldPosition() - (impulse / m1));
+            p2.setOldPosition(p2.getOldPosition() + (impulse / m2));
         }
     }
 }
@@ -62,15 +64,19 @@ void Solver::pushParticles(sf::Clock &spawnClock)
 
     {
         float vx = _cannon_amp * std::sin(_cannon_phase);
-        _cannon_phase += 0.5f;
+        _cannon_phase += _cannon_delta;
 
         /* create the particle ---------------------------------- */
-        float radius = static_cast<float>(rand() % Constants::MAX_PARTICLE_SIZE + 1);
-        _objects.emplace_back(radius,
-
+        float radius = static_cast<float>(rand() % Constants::MAX_PARTICLE_SIZE + Constants::MIN_PARTICLE_SIZE);
+        Particle p = Particle(radius,
+                              {static_cast<uint8_t>(rand() % 255),
+                               static_cast<uint8_t>(rand() % 255),
+                               static_cast<uint8_t>(rand() % 255)},
                               Constants::CANNON_POS, // start at the “cannon”
-
-                              sf::Vector2f{vx, _cannon_y}); // left + sinusoidally up/down
+                              sf::Vector2f{vx, _cannon_y},
+                              sf::Vector2f{0.f, 0.f}, // initial acceleration
+                              _time_step);
+        _objects.emplace_back(std::move(p));
         spawnClock.restart();
     }
 }
@@ -101,31 +107,24 @@ void Solver::applyBoxBoundary()
     for (auto &particle : _objects)
     {
         sf::Vector2f position = particle.getPosition();
-        // sf::Vector2f acce = particle.getVelocity();
         float radius = particle.getRadius();
-
-        auto E = Constants::COR;
 
         if (position.x - radius < left)
         {
             particle.setPosition({left + radius, position.y});
-            // particle.setVelocity({E * velocity.x * -1, velocity.y});
         }
         else if (position.x + radius > right)
         {
             particle.setPosition({right - radius, position.y});
-            // particle.setVelocity({E * velocity.x * -1, velocity.y});
         }
 
         if (position.y - radius < top)
         {
             particle.setPosition({position.x, top + radius});
-            // particle.setVelocity({velocity.x, E * velocity.y * -1});
         }
         else if (position.y + radius > bottom)
         {
             particle.setPosition({position.x, bottom - radius});
-            // particle.setVelocity({velocity.x, E * velocity.y * -1});
         }
     }
 }
@@ -152,7 +151,6 @@ void Solver::update()
     for (int i = 0; i < Constants::SUB_STEPS; ++i)
     {
         applyGravity();
-        // applyBoxBoundary();
         applyCircleBoundary();
         applyCollisions();
         updateObjects(substepT);
@@ -185,7 +183,12 @@ void Solver::leftMouseClick(const sf::Vector2i mousePos)
 {
     if (clickedInTheCircle(mousePos))
     {
-        Particle par = Particle(Constants::MAX_PARTICLE_SIZE, {float(mousePos.x), float(mousePos.y)}, {0.f, 0.f});
+        Particle par = Particle(Constants::MAX_PARTICLE_SIZE,
+                                {static_cast<uint8_t>(rand() % 255),
+                                 static_cast<uint8_t>(rand() % 255),
+                                 static_cast<uint8_t>(rand() % 255)},
+                                {float(mousePos.x), float(mousePos.y)},
+                                {0.f, 0.f});
         pushParticle(par);
     }
 }
