@@ -1,30 +1,16 @@
-#include <iostream>
 #include <SFML/Graphics.hpp>
+#include "verlet.hpp"
 
-class Particle
+class Particle : public VerletObject
 {
 public:
-    Particle(float radius, sf::Vector2f position, sf::Vector2f velocity) : radius_(radius), position_(position), velocity_(velocity) {};
+    Particle(float radius, const sf::Vector2f initial_position, const sf::Vector2f acceleration)
+        : radius_(radius), VerletObject(initial_position, acceleration) {};
 
     float getRadius() const { return radius_; };
-    sf::Vector2f getPosition() const { return position_; };
-    sf::Vector2f getVelocity() const { return velocity_; };
-    sf::Color getColor() const
-    {
-        return color_;
-    }
-
-    void setPosition(const sf::Vector2f &position) { position_ = position; };
-    void setVelocity(const sf::Vector2f &velocity) { velocity_ = velocity; };
-
-    void move(float dt)
-    {
-        position_ += velocity_ * dt;
-    }
+    sf::Color getColor() const { return color_; };
 
 private:
-    float radius_;          // radius of the particle
-    sf::Vector2f position_; // x, y
-    sf::Vector2f velocity_; // x, y
+    float radius_; // radius of the particle
     sf::Color color_ = {rand() % 255, rand() % 255, rand() % 255};
 };

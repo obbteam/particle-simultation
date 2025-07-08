@@ -6,15 +6,16 @@
       "type": "shell",
       "command": "C:/msys64/ucrt64/bin/g++.exe",
       "args": [
-        "main.cpp",
-        "-IC:/Users/obbte/personal_projects/sfml-first/include",
-        "-LC:/Users/obbte/personal_projects/sfml-first/lib",
+        "${workspaceFolder}/main.cpp",
+        "${workspaceFolder}/source/verlet.cpp",
+        "-I${workspaceFolder}/include",
+        "-L${workspaceFolder}/lib",
         "-lsfml-graphics",
         "-lsfml-window",
         "-lsfml-system",
         "-std=c++20",
         "-o",
-        "main.exe"
+        "${workspaceFolder}/main.exe"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

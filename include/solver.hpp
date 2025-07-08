@@ -5,7 +5,7 @@
 
 struct Constants
 {
-    static constexpr float GRAVITY = 100.f;   // m/s^2
+    static constexpr float GRAVITY = 1000.f;  // m/s^2
     static constexpr float FRAME_RATE = 60.f; // frames per second
     static constexpr int SUB_STEPS = 8;
     static constexpr int MAX_PARTICLES = 2000;
@@ -64,18 +64,18 @@ public:
                 p2.setPosition(p2.getPosition() - n * massRatio * delta);
 
                 // impulse calculations
-                sf::Vector2f relVel = p1.getVelocity() - p2.getVelocity();
-                float velAlongN = relVel.x * n.x + relVel.y * n.y;
-                if (velAlongN > 0.f)
-                    continue; // already separating
+                // sf::Vector2f relVel = p1.getVelocity() - p2.getVelocity();
+                // float velAlongN = relVel.x * n.x + relVel.y * n.y;
+                // if (velAlongN > 0.f)
+                //     continue; // already separating
 
-                float e = Constants::COR;
-                float j = -(1.f + e) * velAlongN / (1.f / m1 + 1.f / m2);
+                // float e = Constants::COR;
+                // float j = -(1.f + e) * velAlongN / (1.f / m1 + 1.f / m2);
 
-                sf::Vector2f impulse = j * n;
+                // sf::Vector2f impulse = j * n;
 
-                p1.setVelocity(p1.getVelocity() + impulse / m1);
-                p2.setVelocity(p2.getVelocity() - impulse / m2);
+                // p1.setVelocity(p1.getVelocity() + impulse / m1);
+                // p2.setVelocity(p2.getVelocity() - impulse / m2);
             }
         }
     }
@@ -94,8 +94,8 @@ public:
             /* create the particle ---------------------------------- */
             float radius = static_cast<float>(rand() % Constants::MAX_PARTICLE_SIZE + 1);
             objects_.emplace_back(radius,
-                                  Constants::CANNON_POS,        // start at the “cannon”
-                                  sf::Vector2f{vx, cannon_y_}); // left + sinusoidally up/down
+                                  Constants::CANNON_POS, // start at the “cannon”
+                                  sf::Vector2f{0, 0});   // left + sinusoidally up/down
 
             spawnClock.restart();
         }
@@ -110,7 +110,7 @@ public:
         for (auto &particle : objects_)
         {
             sf::Vector2f position = particle.getPosition();
-            sf::Vector2f velocity = particle.getVelocity();
+            // sf::Vector2f acce = particle.getVelocity();
             float radius = particle.getRadius();
 
             auto E = Constants::COR;
@@ -118,32 +118,32 @@ public:
             if (position.x - radius < left)
             {
                 particle.setPosition({left + radius, position.y});
-                particle.setVelocity({E * velocity.x * -1, velocity.y});
+                // particle.setVelocity({E * velocity.x * -1, velocity.y});
             }
             else if (position.x + radius > right)
             {
                 particle.setPosition({right - radius, position.y});
-                particle.setVelocity({E * velocity.x * -1, velocity.y});
+                // particle.setVelocity({E * velocity.x * -1, velocity.y});
             }
 
             if (position.y - radius < top)
             {
                 particle.setPosition({position.x, top + radius});
-                particle.setVelocity({velocity.x, E * velocity.y * -1});
+                // particle.setVelocity({velocity.x, E * velocity.y * -1});
             }
             else if (position.y + radius > bottom)
             {
                 particle.setPosition({position.x, bottom - radius});
-                particle.setVelocity({velocity.x, E * velocity.y * -1});
+                // particle.setVelocity({velocity.x, E * velocity.y * -1});
             }
         }
     }
 
-    void updateObjects(float substepT)
+    void updateObjects(float dt)
     {
         for (auto &particle : objects_)
         {
-            particle.move(substepT);
+            particle.updatePosition(dt);
         }
     }
 
@@ -155,7 +155,7 @@ public:
         {
             applyGravity();
             applyBoxBoundary();
-            applyCollisions();
+            // applyCollisions();
             updateObjects(substepT);
         }
     }
@@ -165,8 +165,7 @@ public:
     {
         for (auto &particle : objects_)
         {
-            sf::Vector2f newVelocity = particle.getVelocity() + gravity_ * timeStep_;
-            particle.setVelocity(newVelocity);
+            particle.accelerate(gravity_);
         }
     }
 
