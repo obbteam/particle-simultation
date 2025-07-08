@@ -14,6 +14,7 @@ public:
     void updatePosition(float dt);
     void accelerate(const sf::Vector2f &acc) { _acceleration += acc; }
     void setPosition(const sf::Vector2f &pos) { _cur_position = pos; }
+    void setAcceleration(const sf::Vector2f &accel) { _acceleration = accel; }
 
 private:
     sf::Vector2f _old_position;

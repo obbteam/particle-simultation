@@ -8,6 +8,7 @@
       "args": [
         "${workspaceFolder}/main.cpp",
         "${workspaceFolder}/source/verlet.cpp",
+        "${workspaceFolder}/source/solver.cpp",
         "-I${workspaceFolder}/include",
         "-L${workspaceFolder}/lib",
         "-lsfml-graphics",

@@ -16,7 +16,7 @@ public:
         particlesNumText_.setPosition({5.f, 5.f});
     };
 
-    void draw(std::vector<Particle> &particles)
+    void drawParticles(std::vector<Particle> &particles)
     {
         for (const auto &particle : particles)
         {
@@ -38,6 +38,17 @@ public:
         box.setOutlineThickness(2.f);
         box.setOutlineColor(sf::Color::Black);
         window_.draw(box);
+    }
+
+    void drawCircleBounds(float radius, sf::Vector2f pos)
+    {
+        sf::CircleShape circle(radius);
+        circle.setOrigin({radius, radius});
+        circle.setPosition(pos);
+        circle.setFillColor(sf::Color(211, 211, 211));
+        circle.setOutlineThickness(2.f);
+        circle.setOutlineColor(sf::Color::Black);
+        window_.draw(circle);
     }
 
     void updateNumberParticles(int n)
