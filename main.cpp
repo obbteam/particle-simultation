@@ -12,7 +12,7 @@ int main()
     window.setFramerateLimit(Constants::FRAME_RATE);
     Renderer renderer(window);
     std::vector<Particle> particles; // Vector to hold particles
-    particles.reserve(500);          // Reserve space for 1k particles
+    particles.reserve(Constants::MAX_PARTICLES);          // Reserve space for 1k particles
 
     Solver solver(1.f / Constants::FRAME_RATE, particles); // Create a solver with a time step of 1/60 seconds
 
