@@ -12,7 +12,7 @@ class CircleSimulation : public ISimulation
 public:
     CircleSimulation(sf::RenderWindow &win, std::vector<Particle> &particles, float radius, sf::Vector2f pos);
 
-    void handleEvent(const sf::Event &event) override;
+    void handleEvent(const std::optional<sf::Event> &event) override;
 
     void update() override;
 

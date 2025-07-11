@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "particle.hpp"
 
 class Renderer
 {
@@ -60,12 +61,25 @@ public:
         window_.draw(particlesNumText_);
     }
 
-    void updateFPS(float fps)
+    static void updateFPS(sf::RenderWindow &window, float fps)
     {
+        /* these locals are constructed once, the first time the
+           function is called, and reused on every subsequent call */
+        static sf::Font font;
+        static bool ok = font.openFromFile("ARIAL.TTF"); // one-time I/O
+
+        static sf::Text label(font, "", 20);
+        if (ok)
+        { // font loaded?
+            label.setStyle(sf::Text::Bold);
+            label.setFillColor(sf::Color::Green);
+            label.setPosition({650.f, 5.f});
+        }
+
         std::ostringstream oss;
         oss << "FPS: " << std::fixed << std::setprecision(1) << fps;
-        fpsText_.setString(oss.str());
-        window_.draw(fpsText_);
+        label.setString(oss.str());
+        window.draw(label);
     }
 
 private:

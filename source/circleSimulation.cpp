@@ -7,17 +7,17 @@ CircleSimulation::CircleSimulation(sf::RenderWindow &win, std::vector<Particle> 
       time_step_(1.f / Constants::FRAME_RATE),
       solver_(time_step_, particles),
       circle_radius_(radius),
-      circle_pos_(pos)
-{
-    particles.reserve(Constants::MAX_PARTICLES);
-};
+      circle_pos_(pos) {
+      };
 
-void CircleSimulation::handleEvent(const sf::Event &event)
+void CircleSimulation::handleEvent(const std::optional<sf::Event> &event)
 {
-    if (event.getIf<sf::Event::MouseButtonReleased>()->button == sf::Mouse::Button::Left)
-        leftMouseClick(event.getIf<sf::Event::MouseButtonReleased>()->position);
+    if (event->is<sf::Event::MouseButtonReleased>() &&
+        event->getIf<sf::Event::MouseButtonReleased>()->button == sf::Mouse::Button::Left)
+        leftMouseClick(event->getIf<sf::Event::MouseButtonReleased>()->position);
 
-    solver_.changeGravity(event.getIf<sf::Event::KeyReleased>()->scancode);
+    if (event->is<sf::Event::KeyReleased>())
+        solver_.changeGravity(event->getIf<sf::Event::KeyReleased>()->scancode);
 }
 
 void CircleSimulation::update()
@@ -25,6 +25,7 @@ void CircleSimulation::update()
     float substepT = time_step_ / Constants::SUB_STEPS;
     for (int i = 0; i < Constants::SUB_STEPS; ++i)
     {
+        solver_.pushObjects(spawnClock_);
         solver_.applyGravity();
         applyCircleBoundary();
         solver_.applyCollisions();

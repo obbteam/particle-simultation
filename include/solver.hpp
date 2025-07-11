@@ -42,7 +42,7 @@ private:
     sf::Vector2f _box_size = {0.f, 0.f};
     sf::Vector2f _box_pos = {0.f, 0.f};
 
-    std::vector<Particle> _objects;
+    std::vector<Particle> &_objects;
 
     sf::Vector2f _gravity = {0, Constants::GRAVITY};
 
