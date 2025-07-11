@@ -3,7 +3,10 @@
 #include "math.h"
 
 Solver::Solver(float timeStep, std::vector<Particle> &objects)
-    : _time_step(timeStep), _objects(objects) {};
+    : _time_step(timeStep), _objects(objects)
+{
+    objects.reserve(Constants::MAX_PARTICLES);
+};
 
 void Solver::applyCollisions()
 {
@@ -54,7 +57,7 @@ void Solver::applyCollisions()
     }
 }
 
-void Solver::pushParticles(sf::Clock &spawnClock)
+void Solver::pushObjects(sf::Clock &spawnClock)
 {
     if (_objects.size() >= Constants::MAX_PARTICLES)
         return;
@@ -78,23 +81,6 @@ void Solver::pushParticles(sf::Clock &spawnClock)
                               _time_step);
         _objects.emplace_back(std::move(p));
         spawnClock.restart();
-    }
-}
-
-void Solver::applyCircleBoundary()
-{
-    for (auto &particle : _objects)
-    {
-        auto diff = particle.getPosition() - _circle_pos;
-        auto dist = std::hypotf(diff.x, diff.y);
-
-        float min_dist = _circle_radius - particle.getRadius();
-
-        if (dist > min_dist && dist > 0.f)
-        {
-            auto n = diff / dist;
-            particle.setPosition(_circle_pos + n * min_dist);
-        }
     }
 }
 
@@ -145,18 +131,6 @@ void Solver::applyGravity()
     }
 }
 
-void Solver::update()
-{
-    float substepT = _time_step / Constants::SUB_STEPS;
-    for (int i = 0; i < Constants::SUB_STEPS; ++i)
-    {
-        applyGravity();
-        applyCircleBoundary();
-        applyCollisions();
-        updateObjects(substepT);
-    }
-}
-
 void Solver::changeGravity(const sf::Keyboard::Scancode &key)
 {
     switch (key)
@@ -177,27 +151,4 @@ void Solver::changeGravity(const sf::Keyboard::Scancode &key)
     default:
         std::cerr << "Wrong Key for changeGravity" << std::endl;
     }
-}
-
-void Solver::leftMouseClick(const sf::Vector2i mousePos)
-{
-    if (clickedInTheCircle(mousePos))
-    {
-        Particle par = Particle(Constants::MAX_PARTICLE_SIZE,
-                                {static_cast<uint8_t>(rand() % 255),
-                                 static_cast<uint8_t>(rand() % 255),
-                                 static_cast<uint8_t>(rand() % 255)},
-                                {float(mousePos.x), float(mousePos.y)},
-                                {0.f, 0.f});
-        pushParticle(par);
-    }
-}
-
-bool Solver::clickedInTheCircle(const sf::Vector2i mousePos)
-{
-    auto diff = mousePos - sf::Vector2i(_circle_pos);
-    auto dist = std::hypotf(diff.x, diff.y);
-    if (dist > _circle_radius - Constants::MAX_PARTICLE_SIZE)
-        return false;
-    return true;
 }

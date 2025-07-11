@@ -16,22 +16,11 @@ public:
         _box_pos = pos;
     }
 
-    void setCircleBounds(float radius, sf::Vector2f pos)
-    {
-        _circle_radius = radius;
-        _circle_pos = pos;
-    };
-
     void applyCollisions();
-
-    void applyCircleBoundary();
 
     void applyBoxBoundary();
 
     void updateObjects(float dt);
-
-    // Method to update the position of the particles
-    void update();
 
     // Method to apply gravity to the particles
     void applyGravity();
@@ -40,26 +29,18 @@ public:
     void changeGravity(const sf::Keyboard::Scancode &key);
 
     void pushParticle(Particle &p) { _objects.emplace_back(std::move(p)); }
-    void pushParticles(sf::Clock &spawnClock);
-
-    void leftMouseClick(const sf::Vector2i mousePos);
+    void pushObjects(sf::Clock &spawnClock);
 
     std::tuple<sf::Vector2f, sf::Vector2f> getBoxBounds() const { return {_box_size, _box_pos}; }
-    std::tuple<float, sf::Vector2f> getCircleBounds() const { return {_circle_radius, _circle_pos}; }
 
     std::vector<Particle> &getObjects() { return _objects; }
 
     int getNumObjects() const { return _objects.size(); }
 
 private:
-    bool clickedInTheCircle(const sf::Vector2i mousePos);
-
     float _time_step; // Time step for the simulation
     sf::Vector2f _box_size = {0.f, 0.f};
     sf::Vector2f _box_pos = {0.f, 0.f};
-
-    float _circle_radius = 0;
-    sf::Vector2f _circle_pos = {0.f, 0.f};
 
     std::vector<Particle> _objects;
 
