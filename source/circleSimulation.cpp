@@ -33,7 +33,7 @@ void CircleSimulation::update()
     }
 }
 
-void CircleSimulation::render(sf::RenderWindow &win)
+void CircleSimulation::render()
 {
     renderer_.drawCircleBounds(Constants::CIRCLE_RADIUS, Constants::CIRCLE_POS);
     renderer_.updateNumberParticles(solver_.getNumObjects());

@@ -29,6 +29,7 @@ public:
     void changeGravity(const sf::Keyboard::Scancode &key);
 
     void pushParticle(Particle &p) { _objects.emplace_back(std::move(p)); }
+    void pushParticle(Particle &&p) { _objects.emplace_back(p); }
     void pushObjects(sf::Clock &spawnClock);
 
     std::tuple<sf::Vector2f, sf::Vector2f> getBoxBounds() const { return {_box_size, _box_pos}; }

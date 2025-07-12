@@ -16,7 +16,7 @@ public:
 
     void update() override;
 
-    void render(sf::RenderWindow &win) override;
+    void render() override;
 
     void leftMouseClick(const sf::Vector2i &mousePos);
 
