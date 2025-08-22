@@ -11,8 +11,8 @@ struct Constants
     static constexpr int MAX_PARTICLE_SIZE = 5;
     static constexpr int MIN_PARTICLE_SIZE = 1;
 
-    static constexpr int WINDOW_WIDTH = 800;  // pixels
-    static constexpr int WINDOW_HEIGHT = 600; // pixels
+    static constexpr int WINDOW_WIDTH = 1600;  // pixels
+    static constexpr int WINDOW_HEIGHT = 1200; // pixels
     static constexpr sf::Vector2f BOX_SIZE = sf::Vector2f(WINDOW_WIDTH - 50, WINDOW_HEIGHT - 50);
     static constexpr sf::Vector2f BOX_POS = sf::Vector2f((WINDOW_WIDTH - BOX_SIZE.x) / 2, (WINDOW_HEIGHT - BOX_SIZE.y) / 2);
     static constexpr sf::Vector2f CANNON_POS = {BOX_POS.x + (BOX_SIZE.x / 2), BOX_POS.y + (BOX_SIZE.y / 4)};
