@@ -72,9 +72,9 @@ void Solver::pushObjects(sf::Clock &spawnClock)
         /* create the particle ---------------------------------- */
         float radius = static_cast<float>(rand() % Constants::MAX_PARTICLE_SIZE + Constants::MIN_PARTICLE_SIZE);
         Particle p = Particle(radius,
-                              {static_cast<uint8_t>(rand() % 255),
-                               static_cast<uint8_t>(rand() % 255),
-                               static_cast<uint8_t>(rand() % 255)},
+                              {static_cast<uint8_t>(8),
+                               static_cast<uint8_t>(26),
+                               static_cast<uint8_t>(89)},
                               Constants::CANNON_POS, // start at the “cannon”
                               sf::Vector2f{vx, _cannon_y},
                               sf::Vector2f{0.f, 0.f}, // initial acceleration

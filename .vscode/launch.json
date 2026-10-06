@@ -1,45 +1,36 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Simulate (Debug)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/bin/particle-simulation",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build/bin",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "preLaunchTask": "build-debug",
+      "setupCommands": [
         {
-            "name": "Simulate (Debug)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}\\main.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Set Disassembly Flavor to Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "build-sfml-debug"
-        },
-        {
-            "name": "Simulate (Release)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}\\main.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe",
-            "preLaunchTask": "build-sfml-release"
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
         }
-    ]
+      ],
+      "linux": {
+        "MIMode": "gdb",
+        "miDebuggerPath": "/usr/bin/gdb"
+      },
+      "osx": {
+        "MIMode": "lldb"
+      },
+      "windows": {
+        "program": "${workspaceFolder}/build/bin/particle-simulation.exe",
+        "MIMode": "gdb"
+      }
+    }
+  ]
 }

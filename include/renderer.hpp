@@ -26,7 +26,7 @@ public:
             circle.setOrigin({particle.getRadius(), particle.getRadius()});
             circle.setPosition(particle.getPosition());
             circle.setFillColor(particle.getColor());
-            circle.setOutlineThickness(1.f);
+            circle.setOutlineThickness(0.f);
             circle.setOutlineColor(sf::Color::Black);
             window_.draw(circle); // Draw the particle shape
         }

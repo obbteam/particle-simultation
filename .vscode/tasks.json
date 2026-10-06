@@ -2,57 +2,69 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build-sfml-debug",
+      "label": "configure-cmake",
       "type": "shell",
-      "command": "C:/msys64/ucrt64/bin/g++.exe",
+      "command": "cmake",
       "args": [
-        "${workspaceFolder}/main.cpp",
-        "${workspaceFolder}/source/verlet.cpp",
-        "${workspaceFolder}/source/solver.cpp",
-        "${workspaceFolder}/source/circleSimulation.cpp",
-        "-I${workspaceFolder}/include",
-        "-L${workspaceFolder}/lib",
-        "-lsfml-graphics",
-        "-lsfml-window",
-        "-lsfml-system",
-        "-std=c++20",
-        "-o",
-        "${workspaceFolder}/main.exe"
+        "-S",
+        "${workspaceFolder}",
+        "-B",
+        "${workspaceFolder}/build",
+        "-DCMAKE_BUILD_TYPE=Debug"
       ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "build-debug",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "${workspaceFolder}/build",
+        "--config",
+        "Debug"
+      ],
+      "dependsOn": "configure-cmake",
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": []
+      "problemMatcher": [
+        "$gcc"
+      ]
     },
     {
-      "label": "build-sfml-release", // <-- new task
+      "label": "build-release",
       "type": "shell",
-      "command": "C:/msys64/ucrt64/bin/g++.exe",
+      "command": "cmake",
       "args": [
-        "${workspaceFolder}/main.cpp",
-        "${workspaceFolder}/source/verlet.cpp",
-        "${workspaceFolder}/source/solver.cpp",
-        "${workspaceFolder}/source/circleSimulation.cpp",
-        "-I${workspaceFolder}/include",
-        "-L${workspaceFolder}/lib",
-        "-lsfml-graphics",
-        "-lsfml-window",
-        "-lsfml-system",
-        "-std=c++20",
-        "-O3", // optimisation
-        "-DNDEBUG", // disable assert()
-        "-s", // strip symbols (optional)
-        "-o",
-        "${workspaceFolder}/main.exe"
+        "-S",
+        "${workspaceFolder}",
+        "-B",
+        "${workspaceFolder}/build-release",
+        "-DCMAKE_BUILD_TYPE=Release"
       ],
-      "group": {
-        "kind": "build",
-        "isDefault": false
-      }
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "compile-release",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "${workspaceFolder}/build-release",
+        "--config",
+        "Release"
+      ],
+      "dependsOn": "build-release",
+      "group": "build",
+      "problemMatcher": [
+        "$gcc"
+      ]
     }
   ]
 }

@@ -5,6 +5,8 @@
 #include "include/constants.hpp"
 #include "include/ISimulation.hpp"
 #include "include/circleSimulation.hpp"
+#include <memory>
+#include <optional>
 
 static sf::Clock spawnClock; // declared outside the loop
 
@@ -33,7 +35,7 @@ int main()
         sim->update();
 
         window.clear(sf::Color::Black);
-        sim->render(window);
+        sim->render();
 
         float fps = 1.f / dt;
         Renderer::updateFPS(window, fps); // static helper
