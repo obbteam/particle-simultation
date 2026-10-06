@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "particle.hpp"
 #include "constants.hpp"
+#include "grid.hpp"
 
 class Solver
 {
@@ -10,15 +11,7 @@ public:
     // Constructor
     Solver(float timeStep, std::vector<Particle> &objects);
 
-    void setBoxBounds(sf::Vector2f size, sf::Vector2f pos)
-    {
-        _box_size = size;
-        _box_pos = pos;
-    }
-
     void applyCollisions();
-
-    void applyBoxBoundary();
 
     void updateObjects(float dt);
 
@@ -32,18 +25,21 @@ public:
     void pushParticle(Particle &&p) { _objects.emplace_back(p); }
     void pushObjects(sf::Clock &spawnClock);
 
-    std::tuple<sf::Vector2f, sf::Vector2f> getBoxBounds() const { return {_box_size, _box_pos}; }
-
     std::vector<Particle> &getObjects() { return _objects; }
 
     int getNumObjects() const { return _objects.size(); }
 
 private:
     float _time_step; // Time step for the simulation
-    sf::Vector2f _box_size = {0.f, 0.f};
-    sf::Vector2f _box_pos = {0.f, 0.f};
 
     std::vector<Particle> &_objects;
+    
+    Grid _grid = {Grid(
+        Constants::CIRCLE_POS.x - Constants::CIRCLE_RADIUS,
+        Constants::CIRCLE_POS.y - Constants::CIRCLE_RADIUS,
+        Constants::CIRCLE_RADIUS * 2,
+        Constants::CIRCLE_RADIUS * 2,
+        Constants::MAX_PARTICLE_SIZE * 2.f)};
 
     sf::Vector2f _gravity = {0, Constants::GRAVITY};
 

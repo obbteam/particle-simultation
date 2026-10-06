@@ -17,9 +17,11 @@ public:
     }
 
     float getRadius() const { return radius_; };
+    double getMass() const {return mass_; };
     sf::Color getColor() const { return color_; };
 
 private:
     float radius_; // radius of the particle
     sf::Color color_;
+    float mass_ = {std::numbers::pi * radius_ * radius_};
 };

@@ -1,5 +1,6 @@
 #include "../include/circleSimulation.hpp"
 #include "math.h"
+#include <optional>
 
 CircleSimulation::CircleSimulation(sf::RenderWindow &win, std::vector<Particle> &particles, float radius, sf::Vector2f pos)
     : window_(win),
@@ -27,9 +28,9 @@ void CircleSimulation::update()
     {
         solver_.pushObjects(spawnClock_);
         solver_.applyGravity();
+        solver_.updateObjects(substepT);
         applyCircleBoundary();
         solver_.applyCollisions();
-        solver_.updateObjects(substepT);
     }
 }
 

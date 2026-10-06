@@ -1,6 +1,7 @@
 #include "../include/solver.hpp"
 #include <iostream>
 #include "math.h"
+#include "../include/grid.hpp"
 
 Solver::Solver(float timeStep, std::vector<Particle> &objects)
     : _time_step(timeStep), _objects(objects)
@@ -8,54 +9,78 @@ Solver::Solver(float timeStep, std::vector<Particle> &objects)
     objects.reserve(Constants::MAX_PARTICLES);
 };
 
+
+static void resolveParticles(Particle& p1, Particle &p2) {
+    sf::Vector2f d = p1.getPosition() - p2.getPosition();
+
+    float dist2 = d.x * d.x + d.y * d.y;
+    float minDist = p1.getRadius() + p2.getRadius();
+
+    if (dist2 >= minDist * minDist)
+        return;
+
+    float dist = std::sqrt(dist2);
+    sf::Vector2f n = (dist > 1e-6f) ? d / dist : sf::Vector2f(1.f, 0.f);
+    float delta = minDist - dist; // how much are they are jammed into each other
+    
+    float m1 = p1.getMass(), m2 = p2.getMass();
+    float totalMass = m1 + m2;
+    float massRatio = m1 / totalMass;
+
+    sf::Vector2f v1 = p1.getPosition() - p1.getOldPosition();
+    sf::Vector2f v2 = p2.getPosition() - p2.getOldPosition();
+
+    p1.setPosition(p1.getPosition() + 0.5f * n * (1 - massRatio) * delta);
+    p2.setPosition(p2.getPosition() - 0.5f * n * massRatio * delta);
+
+    // impulse calculations
+    sf::Vector2f relVel = v1 - v2;
+    float accelAlongN = relVel.x * n.x + relVel.y * n.y;
+    if (accelAlongN > 0.f)
+        return; // already separating
+
+    float j = -(1.f + Constants::COR) * accelAlongN / (1.f / m1 + 1.f / m2);
+
+    sf::Vector2f impulse = j * n;
+
+    p1.setOldPosition(p1.getOldPosition() - (impulse / m1));
+    p2.setOldPosition(p2.getOldPosition() + (impulse / m2));
+}
+
+
 void Solver::applyCollisions()
 {
-    for (int i = 0; i < _objects.size(); ++i)
+    _grid.clear();
+
+    for (int i = 0; i < _objects.size(); ++i) 
+        _grid.insert(i, _objects[i].getPosition());
+
+    for (int cy = 0; cy < _grid.rows; ++cy)
     {
-        for (int k = i + 1; k < _objects.size(); ++k)
+        for (int cx = 0; cx < _grid.cols; ++cx)
         {
-            auto &p1 = _objects[i];
-            auto &p2 = _objects[k];
+            auto &cell = _grid.cells[cy * _grid.cols + cx];
+            if (cell.empty()) continue;
 
-            sf::Vector2f n = p1.getPosition() - p2.getPosition();
+            for (int dy = -1; dy <= 1; ++dy) {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    int nx = cx + dx, ny = cy + dy;
+                    if (nx < 0 || nx >= _grid.cols || ny < 0 || ny >=_grid.rows ) continue;
 
-            float dist = std::hypot(n.x, n.y);
-            dist = dist == 0 ? 0.0001f : dist;
-            auto minDist = p1.getRadius() + p2.getRadius();
-
-            if (dist >= minDist)
-                continue;
-
-            float m1 = std::numbers::pi * p1.getRadius() * p1.getRadius();
-            float m2 = std::numbers::pi * p2.getRadius() * p2.getRadius();
-
-            // positional calculations
-            n /= dist;                    // direction unit vector (length = 1)
-            float delta = minDist - dist; // how much are they are jammed into each other
-            float totalMass = m1 + m2;
-            float massRatio = m1 / totalMass;
-
-            p1.setPosition(p1.getPosition() + 0.5f * n * (1 - massRatio) * delta);
-            p2.setPosition(p2.getPosition() - 0.5f * n * massRatio * delta);
-
-            // impulse calculations
-            auto v1 = p1.getPosition() - p1.getOldPosition();
-            auto v2 = p2.getPosition() - p2.getOldPosition();
-            sf::Vector2f relVel = v1 - v2;
-            float accelAlongN = relVel.x * n.x + relVel.y * n.y;
-            if (accelAlongN > 0.f)
-                continue; // already separating
-
-            float e = Constants::COR;
-            float j = -(1.f + e) * accelAlongN / (1.f / m1 + 1.f / m2);
-
-            sf::Vector2f impulse = j * n;
-
-            p1.setOldPosition(p1.getOldPosition() - (impulse / m1));
-            p2.setOldPosition(p2.getOldPosition() + (impulse / m2));
+                    auto &other = _grid.cells[ny * _grid.cols + nx];
+                    
+                    for (int a: cell)
+                        for (int b: other)
+                            if (a < b)
+                                resolveParticles(_objects[a], _objects[b]);
+                }
+            }
         }
     }
 }
+
+
+
 
 void Solver::pushObjects(sf::Clock &spawnClock)
 {
@@ -72,9 +97,9 @@ void Solver::pushObjects(sf::Clock &spawnClock)
         /* create the particle ---------------------------------- */
         float radius = static_cast<float>(rand() % Constants::MAX_PARTICLE_SIZE + Constants::MIN_PARTICLE_SIZE);
         Particle p = Particle(radius,
-                              {static_cast<uint8_t>(8),
-                               static_cast<uint8_t>(26),
-                               static_cast<uint8_t>(89)},
+                              {static_cast<uint8_t>(15),
+                               static_cast<uint8_t>(94),
+                               static_cast<uint8_t>(156)},
                               Constants::CANNON_POS, // start at the “cannon”
                               sf::Vector2f{vx, _cannon_y},
                               sf::Vector2f{0.f, 0.f}, // initial acceleration
@@ -84,36 +109,6 @@ void Solver::pushObjects(sf::Clock &spawnClock)
     }
 }
 
-void Solver::applyBoxBoundary()
-{
-    auto left = _box_pos.x;
-    auto right = _box_pos.x + _box_size.x;
-    auto top = _box_pos.y;
-    auto bottom = _box_pos.y + _box_size.y;
-    for (auto &particle : _objects)
-    {
-        sf::Vector2f position = particle.getPosition();
-        float radius = particle.getRadius();
-
-        if (position.x - radius < left)
-        {
-            particle.setPosition({left + radius, position.y});
-        }
-        else if (position.x + radius > right)
-        {
-            particle.setPosition({right - radius, position.y});
-        }
-
-        if (position.y - radius < top)
-        {
-            particle.setPosition({position.x, top + radius});
-        }
-        else if (position.y + radius > bottom)
-        {
-            particle.setPosition({position.x, bottom - radius});
-        }
-    }
-}
 
 void Solver::updateObjects(float dt)
 {
