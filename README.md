@@ -1,9 +1,20 @@
+
+
+
 # Particle Simulation
  
 2D particle simulation in C++ and SFML 3. Verlet integration, grid-based collisions, circular boundary.
  
 **20,000 particles at 60 FPS.**
- 
+Machine specs:
+
+CPU: AMD Ryzen™ 7 7840HS, GPU: RTX4060, RAM: 16GB
+
+
+
+https://github.com/user-attachments/assets/c569874d-facb-499e-8a64-ef0631ee9647
+
+
 <!-- Video: drag the .mp4 into the GitHub editor, or paste a link here -->
  
 ## Features
