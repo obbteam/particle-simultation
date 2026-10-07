@@ -1,5 +1,5 @@
 #include "../include/circleSimulation.hpp"
-#include "math.h"
+#include <cmath>
 #include <optional>
 
 CircleSimulation::CircleSimulation(sf::RenderWindow &win, std::vector<Particle> &particles, float radius, sf::Vector2f pos)
